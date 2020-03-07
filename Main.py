@@ -1,100 +1,35 @@
+from Paddle import Paddle
+from Ball import Ball
+from ScoreBoard import ScoreBoard
 import turtle
+
+screen_width = 800
+screen_height = 600
 
 window = turtle.Screen()
 window.title("Serg's pong learning project")
 window.bgcolor("black")
-window.setup(width=800, height=600)
+window.setup(width=screen_width, height=screen_height)
 window.tracer()
 
-# Paddle A
-paddle_a = turtle.Turtle()
-paddle_a.speed(0)
-paddle_a.shape("square")
-paddle_a.color("white")
-paddle_a.shapesize(stretch_wid=5, stretch_len=1)
-paddle_a.penup()
-paddle_a.goto(-350, 0)
-
-# Paddle A
-paddle_b = turtle.Turtle()
-paddle_b.speed(0)
-paddle_b.shape("square")
-paddle_b.color("white")
-paddle_b.shapesize(stretch_wid=5, stretch_len=1)
-paddle_b.penup()
-paddle_b.goto(350, 0)
-
-# Ball
-ball = turtle.Turtle()
-ball.speed(0)
-ball.shape("square")
-ball.color("white")
-ball.penup()
-ball.dx = 5
-ball.dy = 5
-
-
-# Functions
-def paddle_a_up():
-    y = paddle_a.ycor()
-    y += 20
-    paddle_a.sety(y)
-
-
-def paddle_a_down():
-    y = paddle_a.ycor()
-    y -= 20
-    paddle_a.sety(y)
-
-
-def paddle_b_up():
-    y = paddle_b.ycor()
-    y += 20
-    paddle_b.sety(y)
-
-
-def paddle_b_down():
-    y = paddle_b.ycor()
-    y -= 20
-    paddle_b.sety(y)
+left_paddle = Paddle((-screen_width/2+30, 0))
+right_paddle = Paddle((screen_width/2-30, 0))
+score_board = ScoreBoard()
+ball = Ball(score_board)
 
 
 # Keyboard binding
 window.listen()
-window.onkeypress(paddle_a_up, "w")
-window.onkeypress(paddle_a_down, "s")
-window.onkeypress(paddle_b_up, "Up")
-window.onkeypress(paddle_b_down, "Down")
+window.onkeypress(left_paddle.move_up, "w")
+window.onkeypress(left_paddle.move_down, "s")
+window.onkeypress(right_paddle.move_up, "Up")
+window.onkeypress(right_paddle.move_down, "Down")
 
 # Main loop
 while True:
     window.update()
 
-    # Move the ball
-    ball.setx(ball.xcor() + ball.dx)
-    ball.sety(ball.ycor() + ball.dy)
-
-    # Border checking
-    if ball.ycor() > 290:
-        ball.sety(290)
-        ball.dy = -ball.dy
-
-    if ball.ycor() < -290:
-        ball.sety(-290)
-        ball.dy = -ball.dy
-
-    if ball.xcor() < -390:
-        ball.goto(0, 0)
-        ball.dx *= -1
-
-    if ball.xcor() > 390:
-        ball.goto(0, 0)
-        ball.dx *= -1
-
-    if 350 > ball.xcor() > 330 and paddle_b.ycor() + 60 > ball.ycor() > paddle_b.ycor() - 60:
-        ball.setx(330)
-        ball.dx *= -1
-
-    if -350 < ball.xcor() < -330 and paddle_a.ycor() + 40 > ball.ycor() > paddle_a.ycor() - 40:
-        ball.setx(-330)
-        ball.dx *= -1
+    ball.move()
+    ball.border_check()
+    ball.paddle_check(left_paddle)
+    ball.paddle_check(right_paddle)
